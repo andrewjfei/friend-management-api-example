@@ -1,7 +1,7 @@
 
-# Friend Management API Example
+# User Management API Example
 
-An example of a REST API for managing friends.
+An example of a REST API for managing users.
 
 ## Prerequisites
 
