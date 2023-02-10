@@ -17,7 +17,7 @@ public class HelloWorldController {
 
     @GetMapping
     public ResponseEntity<String> helloWorld() {
-        logger.debug("Hit /api/hello-world endpoint");
+        logger.debug("Hit GET /api/hello-world endpoint");
         String response = "Hello World!";
         return new ResponseEntity<>(response, OK);
     }

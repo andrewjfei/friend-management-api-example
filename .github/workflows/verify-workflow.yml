@@ -1,0 +1,35 @@
+name: Verify Workflow
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  verify:
+    name: Verify Project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow Clones Disabled For Better Relevancy Of Analysis
+      - name: Set Up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+      - name: Cache SonarCloud Packages
+        uses: actions/cache@v3 # Cache Dependencies & Build Outputs To Improve Execution Time
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Maven Packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Verify & Analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed To Get PR Information
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
