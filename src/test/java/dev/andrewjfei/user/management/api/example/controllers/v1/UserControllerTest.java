@@ -48,4 +48,14 @@ public class UserControllerTest {
         assertEquals(expected, response.getBody());
     }
 
+    @Test
+    public void testRemoveFriend_returnsCorrectString() {
+        String expected = "Friend Removed.";
+
+        ResponseEntity<String> response = userController.removeFriend();
+
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+    }
+
 }
