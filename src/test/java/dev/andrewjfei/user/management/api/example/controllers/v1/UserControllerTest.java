@@ -14,22 +14,45 @@ public class UserControllerTest {
         this.userController = new UserController();
     }
 
-    @Test
-    public void testSendFriendRequest_returnsCorrectString() {
-        String expected = "Friend request sent.";
-
-        ResponseEntity<String> response = userController.sendFriendRequest();
-
-        assertEquals(OK, response.getStatusCode());
-        assertEquals(expected, response.getBody());
-    }
-
+    /********************* User APIs *********************/
 
     @Test
     public void testBlockUser_returnsCorrectString() {
         String expected = "User blocked.";
 
         ResponseEntity<String> response = userController.blockUser();
+
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+    }
+
+    /********************* User Friends APIs *********************/
+
+    @Test
+    public void testAddFriend_returnsCorrectString() {
+        String expected = "Friend request sent.";
+
+        ResponseEntity<String> response = userController.addFriend();
+
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+    }
+
+    @Test
+    public void testFetchAllFriends_returnsCorrectString() {
+        String expected = "Fetched all friends.";
+
+        ResponseEntity<String> response = userController.fetchAllFriends();
+
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+    }
+
+    @Test
+    public void testRemoveFriend_returnsCorrectString() {
+        String expected = "Friend Removed.";
+
+        ResponseEntity<String> response = userController.removeFriend();
 
         assertEquals(OK, response.getStatusCode());
         assertEquals(expected, response.getBody());
