@@ -13,10 +13,10 @@
 
     <!-- Project Information -->
     <groupId>dev.andrewjfei</groupId>
-    <artifactId>friend-management-api-example</artifactId>
+    <artifactId>user-management-api-example</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>Friend Management API Example</name>
-    <description>An example of a REST API for managing friends.</description>
+    <name>User Management API Example</name>
+    <description>An example of a REST API for managing users.</description>
     <packaging>jar</packaging>
 
     <properties>
@@ -40,7 +40,7 @@
         <sonar.version>3.9.1.2184</sonar.version>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.organization>andrewjfei</sonar.organization>
-        <sonar.projectKey>andrewjfei_friend-management-api-example</sonar.projectKey>
+        <sonar.projectKey>andrewjfei_user-management-api-example</sonar.projectKey>
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 
         <!-- Checkstyle Properties -->

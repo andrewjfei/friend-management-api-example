@@ -1,4 +1,4 @@
-package dev.andrewjfei.friend.management.api.example.controllers;
+package dev.andrewjfei.user.management.api.example.controllers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

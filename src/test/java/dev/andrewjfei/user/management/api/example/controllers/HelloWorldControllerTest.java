@@ -1,4 +1,4 @@
-package dev.andrewjfei.friend.management.api.example.controllers;
+package dev.andrewjfei.user.management.api.example.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
@@ -8,10 +8,14 @@ import static org.springframework.http.HttpStatus.OK;
 
 public class HelloWorldControllerTest {
 
-    private HelloWorldController helloWorldController = new HelloWorldController();
+    private HelloWorldController helloWorldController;
+
+    public HelloWorldControllerTest() {
+        this.helloWorldController = new HelloWorldController();
+    }
 
     @Test
-    public void test() {
+    public void testHelloWorld_returnsCorrectString() {
         String expected = "Hello World!";
 
         ResponseEntity<String> response = helloWorldController.helloWorld();
