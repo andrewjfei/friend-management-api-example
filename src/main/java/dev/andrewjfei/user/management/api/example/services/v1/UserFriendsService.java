@@ -2,6 +2,7 @@ package dev.andrewjfei.user.management.api.example.services.v1;
 
 import dev.andrewjfei.user.management.api.example.daos.FriendshipDao;
 import dev.andrewjfei.user.management.api.example.daos.UserDao;
+import dev.andrewjfei.user.management.api.example.exceptions.UserManagementApiExampleException;
 import dev.andrewjfei.user.management.api.example.repositories.v1.UserRepository;
 import dev.andrewjfei.user.management.api.example.transactions.responses.BasicUserResponse;
 import java.util.ArrayList;
@@ -13,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND;
 import static dev.andrewjfei.user.management.api.example.utils.MapperUtil.toBasicUserResponse;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Service
 public class UserFriendsService {
@@ -31,9 +34,8 @@ public class UserFriendsService {
         Optional<UserDao> userDaoOptional = userRepository.findById(userId);
 
         if (userDaoOptional.isEmpty()) {
-            // TODO: Throw user not found exception
-            LOGGER.error("User not found error");
-            throw new RuntimeException();
+            LOGGER.error("User ({}) does not exist", userId);
+            throw new UserManagementApiExampleException(USER_NOT_FOUND, BAD_REQUEST);
         }
 
         UserDao userDao = userDaoOptional.get();
@@ -41,12 +43,13 @@ public class UserFriendsService {
         List<BasicUserResponse> response = new ArrayList<>();
 
         for (FriendshipDao friendshipDao : userDao.getFriends()) {
-            Optional<UserDao> friendDaoOptional = userRepository.findById(friendshipDao.getReceiver().getId());
+            UUID friendId = friendshipDao.getReceiver().getId();
+
+            Optional<UserDao> friendDaoOptional = userRepository.findById(friendId);
 
             if (friendDaoOptional.isEmpty()) {
-                // TODO: Throw user not found exception
-                LOGGER.error("User not found error");
-                throw new RuntimeException();
+                LOGGER.error("User ({}) does not exist", friendId);
+                throw new UserManagementApiExampleException(USER_NOT_FOUND, BAD_REQUEST);
             }
 
             UserDao friendDao = friendDaoOptional.get();
