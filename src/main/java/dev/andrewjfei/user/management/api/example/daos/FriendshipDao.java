@@ -1,8 +1,10 @@
 package dev.andrewjfei.user.management.api.example.daos;
 
+import dev.andrewjfei.user.management.api.example.models.FriendshipId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -15,6 +17,7 @@ import org.hibernate.annotations.Where;
 @Entity
 @Table(name = "[friendship]")
 @Where(clause = "is_accepted")
+@IdClass(FriendshipId.class)
 @Getter
 @Setter
 @ToString

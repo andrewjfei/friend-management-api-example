@@ -1,24 +1,25 @@
 package dev.andrewjfei.user.management.api.example.controllers.v1;
 
 import dev.andrewjfei.user.management.api.example.controllers.BaseComponentTest;
-import dev.andrewjfei.user.management.api.example.services.v1.UserFriendsService;
+import dev.andrewjfei.user.management.api.example.exceptions.UserManagementApiExampleException;
 import dev.andrewjfei.user.management.api.example.transactions.requests.UserIdRequest;
 import dev.andrewjfei.user.management.api.example.transactions.responses.BasicUserResponse;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
+import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
 public class UserControllerComponentTest extends BaseComponentTest {
 
     @Autowired
     private UserController userController;
-
-    @Autowired
-    private UserFriendsService userFriendsService;
 
     // Joe Smith
     private final String USER_ID = "11afa5b4-c622-4320-a4e9-7c374172b63d";
@@ -66,6 +67,21 @@ public class UserControllerComponentTest extends BaseComponentTest {
 
         assertEquals(OK, response.getStatusCode());
         assertEquals(NUM_OF_FRIENDS, userFriendsList.size());
+    }
+
+    @Test
+    public void testFetchAllFriends_invalidUserId_throwsException() {
+        // Given
+        String invalidUserId = UUID.randomUUID().toString();
+        UserIdRequest request = new UserIdRequest(invalidUserId);
+
+        // When
+        // Then
+        UserManagementApiExampleException userManagementApiExampleException =
+                assertThrows(UserManagementApiExampleException.class, () ->  userController.fetchAllFriends(request));
+
+        assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
+        assertEquals(USER_NOT_FOUND, userManagementApiExampleException.getError());
     }
 
     @Test
