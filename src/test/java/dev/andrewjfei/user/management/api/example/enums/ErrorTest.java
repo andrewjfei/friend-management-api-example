@@ -2,6 +2,7 @@ package dev.andrewjfei.user.management.api.example.enums;
 
 import org.junit.jupiter.api.Test;
 
+import static dev.andrewjfei.user.management.api.example.enums.Error.UNEXPECTED_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ErrorTest {
@@ -11,7 +12,7 @@ public class ErrorTest {
         int errorCode = 0;
         String message = "An unexpected error has occurred.";
 
-        Error error = Error.UNEXPECTED_ERROR;
+        Error error = UNEXPECTED_ERROR;
 
         assertEquals(errorCode, error.getErrorCode());
         assertEquals(message, error.getMessage());
