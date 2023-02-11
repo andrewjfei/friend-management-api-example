@@ -10,23 +10,25 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "[friendship]")
+@Where(clause = "is_accepted")
 @Getter
 @Setter
 @ToString
-public class FriendshipDAO {
+public class FriendshipDao {
 
     @Id
     @ManyToOne
     @JoinColumn(name = "[requester_id]", referencedColumnName = "id", nullable = false)
-    private UserDAO requester;
+    private UserDao requester;
 
     @Id
     @ManyToOne
     @JoinColumn(name = "[receiver_id]", referencedColumnName = "id", nullable = false)
-    private UserDAO receiver;
+    private UserDao receiver;
 
     @Column(name = "[is_accepted]", columnDefinition = "BOOLEAN", nullable = false)
     private boolean isAccepted;
@@ -34,11 +36,11 @@ public class FriendshipDAO {
     @Column(name = "[created]", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime created;
 
-    public FriendshipDAO() {
+    public FriendshipDao() {
 
     }
 
-    public FriendshipDAO(UserDAO requester, UserDAO receiver) {
+    public FriendshipDao(UserDao requester, UserDao receiver) {
         this.requester = requester;
         this.receiver = receiver;
         this.isAccepted = false;

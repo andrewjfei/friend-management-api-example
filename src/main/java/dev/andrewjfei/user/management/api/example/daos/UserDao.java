@@ -2,6 +2,7 @@ package dev.andrewjfei.user.management.api.example.daos;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -19,7 +20,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Getter
 @Setter
 @ToString
-public class UserDAO {
+public class UserDao {
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -39,17 +40,17 @@ public class UserDAO {
     @Column(name = "[password]", columnDefinition = "VARCHAR", nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "receiver")
-    private List<FriendshipDAO> friends;
+    @OneToMany(mappedBy = "requester", fetch = FetchType.EAGER)
+    private List<FriendshipDao> friends;
 
     @Column(name = "[created]", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime created;
 
-    public UserDAO() {
+    public UserDao() {
 
     }
 
-    public UserDAO(String username, String firstName, String lastName, String password) {
+    public UserDao(String username, String firstName, String lastName, String password) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
