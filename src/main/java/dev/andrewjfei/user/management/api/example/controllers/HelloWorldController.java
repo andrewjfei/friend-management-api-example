@@ -13,11 +13,11 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/hello-world")
 public class HelloWorldController {
 
-    private Logger logger = LoggerFactory.getLogger(HelloWorldController.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(HelloWorldController.class);
 
     @GetMapping
     public ResponseEntity<String> helloWorld() {
-        logger.debug("Hit GET /api/hello-world endpoint");
+        LOGGER.debug("Hit GET /api/hello-world endpoint");
         String response = "Hello World!";
         return new ResponseEntity<>(response, OK);
     }

@@ -51,6 +51,9 @@
         <jacoco.output.directory>${project.build.directory}/jacoco</jacoco.output.directory>
         <jacoco.exec.file.path>${jacoco.output.directory}/jacoco.exec</jacoco.exec.file.path>
 
+        <!-- EasyRandom Properties -->
+        <easy.random.version>5.0.0</easy.random.version>
+
         <!-- Testcontainers Properties -->
         <testcontainers.version>1.17.6</testcontainers.version>
 
@@ -90,6 +93,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- EasyRandom -->
+        <dependency>
+            <groupId>org.jeasy</groupId>
+            <artifactId>easy-random-core</artifactId>
+            <version>${easy.random.version}</version>
             <scope>test</scope>
         </dependency>
 

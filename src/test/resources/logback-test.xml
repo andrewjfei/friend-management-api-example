@@ -1,0 +1,28 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <!-- Spring Boot Framework -->
+    <logger name="_org.springframework" level="INFO" />
+    <logger name="org.springframework" level="INFO" />
+
+    <!-- Hikari -->
+    <logger name="com.zaxxer.hikari" level="INFO" />
+
+    <!-- Hibernate -->
+    <logger name="org.hibernate" level="INFO" />
+    <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="OFF" />
+
+    <!-- Testcontainers -->
+    <logger name="org.testcontainers" level="INFO"/>
+    <logger name="com.github.dockerjava" level="INFO"/>
+
+</configuration>

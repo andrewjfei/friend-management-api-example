@@ -38,7 +38,7 @@
         <module name="Regexp">
             <property name="format" value="System\.(out|err)"/>
             <property name="illegalPattern" value="true"/>
-            <property name="message" value="System logs should be replaced by logger."/>
+            <property name="message" value="System.out logs should be replaced by LOGGER"/>
         </module>
 
         <!-- Checks that the right curly brace is placed correctly -->
