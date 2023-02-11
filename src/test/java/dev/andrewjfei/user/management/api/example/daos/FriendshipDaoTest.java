@@ -2,7 +2,7 @@ package dev.andrewjfei.user.management.api.example.daos;
 
 import org.junit.jupiter.api.Test;
 
-import static dev.andrewjfei.user.management.api.example.utils.UserUtil.generateRandomUserDAO;
+import static dev.andrewjfei.user.management.api.example.utils.UserUtil.generateRandomUserDao;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,8 +25,8 @@ public class FriendshipDaoTest {
 
     @Test
     public void testNonEmptyConstructor_returnsCorrectFriendshipDao() {
-        UserDao requester = generateRandomUserDAO();
-        UserDao receiver = generateRandomUserDAO();
+        UserDao requester = generateRandomUserDao();
+        UserDao receiver = generateRandomUserDao();
 
         friendshipDao = new FriendshipDao(requester, receiver);
 
@@ -39,8 +39,8 @@ public class FriendshipDaoTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void testEquals_onSameObjects_returnsTrue() {
-        UserDao requester = generateRandomUserDAO();
-        UserDao receiver = generateRandomUserDAO();
+        UserDao requester = generateRandomUserDao();
+        UserDao receiver = generateRandomUserDao();
 
         friendshipDao = new FriendshipDao(requester, receiver);
 
@@ -53,11 +53,11 @@ public class FriendshipDaoTest {
 
     @Test
     public void testEquals_onDifferentObjects_returnsFalse() {
-        UserDao requester = generateRandomUserDAO();
-        UserDao receiver = generateRandomUserDAO();
+        UserDao requester = generateRandomUserDao();
+        UserDao receiver = generateRandomUserDao();
 
-        UserDao anotherRequester = generateRandomUserDAO();
-        UserDao anotherReceiver = generateRandomUserDAO();
+        UserDao anotherRequester = generateRandomUserDao();
+        UserDao anotherReceiver = generateRandomUserDao();
 
         friendshipDao = new FriendshipDao(requester, receiver);
 

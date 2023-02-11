@@ -11,7 +11,7 @@ public class UserUtil {
 
     }
 
-    public static UserDao generateRandomUserDAO() {
+    public static UserDao generateRandomUserDao() {
         return new UserDao(
                 easyRandom.nextObject(String.class),
                 easyRandom.nextObject(String.class),
@@ -19,4 +19,5 @@ public class UserUtil {
                 easyRandom.nextObject(String.class)
         );
     }
+
 }
