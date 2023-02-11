@@ -1,7 +1,9 @@
 package dev.andrewjfei.user.management.api.example.models;
 
 import dev.andrewjfei.user.management.api.example.daos.UserDao;
+import lombok.Getter;
 
+@Getter
 public class FriendshipId {
 
     private UserDao requester;
