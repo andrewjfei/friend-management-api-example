@@ -4,8 +4,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,7 +39,10 @@ public class UserDAO {
     @Column(name = "[password]", columnDefinition = "VARCHAR", nullable = false)
     private String password;
 
-    @Column(name = "[created]", columnDefinition = "DATETIME")
+    @OneToMany(mappedBy = "receiver")
+    private List<FriendshipDAO> friends;
+
+    @Column(name = "[created]", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime created;
 
     public UserDAO() {

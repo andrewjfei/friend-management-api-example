@@ -6,6 +6,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends CrudRepository<UUID, UserDAO> {
+public interface UserRepository extends CrudRepository<UserDAO, UUID> {
+
+
 
 }
