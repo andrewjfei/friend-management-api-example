@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
+import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_ERROR;
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -38,6 +39,10 @@ public class UserControllerComponentTest extends BaseComponentTest {
     private final String JOE_SMITH_USER_ID = "11afa5b4-c622-4320-a4e9-7c374172b63d";
 
     private final int JOE_SMITH_NUM_OF_FRIENDS = 1;
+
+    // Casey Wang
+
+    private final String CASEY_WANG_USER_ID = "26770bad-887c-4ef7-a77c-f582d50e201c";
 
     // Alex Chen
 
@@ -78,6 +83,50 @@ public class UserControllerComponentTest extends BaseComponentTest {
 
         assertFalse(friendshipDao.isAccepted());
         assertTrue(friendshipDao.getCreated().isAfter(now));
+    }
+
+    @Test
+    public void testAddFriend_pendingRequestOrAlreadyFriends_throwsException() {
+        // Given
+        TargetUserIdRequest request = new TargetUserIdRequest(JOE_SMITH_USER_ID, CASEY_WANG_USER_ID);
+
+        // When
+        // Then
+        UserManagementApiExampleException userManagementApiExampleException =
+                assertThrows(UserManagementApiExampleException.class, () ->  userController.addFriend(request));
+
+        assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
+        assertEquals(USER_FRIEND_REQUEST_ERROR, userManagementApiExampleException.getError());
+    }
+
+    @Test
+    public void testAddFriend_invalidRequesterId_throwsException() {
+        // Given
+        String invalidUserId = UUID.randomUUID().toString();
+        TargetUserIdRequest request = new TargetUserIdRequest(invalidUserId, CASEY_WANG_USER_ID);
+
+        // When
+        // Then
+        UserManagementApiExampleException userManagementApiExampleException =
+                assertThrows(UserManagementApiExampleException.class, () ->  userController.addFriend(request));
+
+        assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
+        assertEquals(USER_NOT_FOUND, userManagementApiExampleException.getError());
+    }
+
+    @Test
+    public void testAddFriend_invalidReceiverId_throwsException() {
+        // Given
+        String invalidUserId = UUID.randomUUID().toString();
+        TargetUserIdRequest request = new TargetUserIdRequest(JOE_SMITH_USER_ID, invalidUserId);
+
+        // When
+        // Then
+        UserManagementApiExampleException userManagementApiExampleException =
+                assertThrows(UserManagementApiExampleException.class, () ->  userController.addFriend(request));
+
+        assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
+        assertEquals(USER_NOT_FOUND, userManagementApiExampleException.getError());
     }
 
     @Test
