@@ -66,7 +66,7 @@ public class UserDaoTest {
         userDao.setLastName(lastName);
         userDao.setPassword(password);
         userDao.setCreated(created);
-        userDao.setFriends(friendshipDaoList);
+        userDao.setFriendships(friendshipDaoList);
 
         assertEquals(id, userDao.getId());
         assertEquals(username, userDao.getUsername());
@@ -75,9 +75,42 @@ public class UserDaoTest {
         assertEquals(password, userDao.getPassword());
         assertEquals(created, userDao.getCreated());
 
+        assertEquals(friendshipDaoList.size(), userDao.getFriendships().size());
+
+        for (FriendshipDao friendship : userDao.getFriendships()) {
+            assertTrue(friendshipDaoList.contains(friendship));
+        }
+    }
+
+    @Test
+    public void testGetFriends_returnsCorrectList() {
+        FriendshipDao friendshipDao = generateRandomFriendshipDao();
+        friendshipDao.setAccepted(true);
+
+        List<FriendshipDao> friendshipDaoList = Collections.singletonList(friendshipDao);
+
+        userDao = new UserDao();
+        userDao.setFriendships(friendshipDaoList);
+
         assertEquals(friendshipDaoList.size(), userDao.getFriends().size());
 
         for (FriendshipDao friendship : userDao.getFriends()) {
+            assertTrue(friendshipDaoList.contains(friendship));
+        }
+    }
+
+    @Test
+    public void testGetFriendRequests_returnsCorrectList() {
+        FriendshipDao friendshipDao = generateRandomFriendshipDao();
+
+        List<FriendshipDao> friendshipDaoList = Collections.singletonList(friendshipDao);
+
+        userDao = new UserDao();
+        userDao.setFriendships(friendshipDaoList);
+
+        assertEquals(friendshipDaoList.size(), userDao.getFriendRequests().size());
+
+        for (FriendshipDao friendship : userDao.getFriendRequests()) {
             assertTrue(friendshipDaoList.contains(friendship));
         }
     }

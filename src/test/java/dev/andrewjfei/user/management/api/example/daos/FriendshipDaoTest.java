@@ -2,6 +2,7 @@ package dev.andrewjfei.user.management.api.example.daos;
 
 import org.junit.jupiter.api.Test;
 
+import static dev.andrewjfei.user.management.api.example.utils.FriendshipUtil.generateRandomFriendshipDao;
 import static dev.andrewjfei.user.management.api.example.utils.UserUtil.generateRandomUserDao;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -66,6 +67,22 @@ public class FriendshipDaoTest {
         boolean result = friendshipDao.equals(anotherFriendshipDao);
 
         assertFalse(result);
+    }
+
+    @Test
+    public void testIsPendingRequest_whenIsAcceptedIsFalse_returnsTrue() {
+        FriendshipDao friendshipDao = generateRandomFriendshipDao();
+        friendshipDao.setAccepted(false);
+
+        assertTrue(friendshipDao.isPendingRequest());
+    }
+
+    @Test
+    public void testIsPendingRequest_whenIsAcceptedIsTrue_returnsFalse() {
+        FriendshipDao friendshipDao = generateRandomFriendshipDao();
+        friendshipDao.setAccepted(true);
+
+        assertFalse(friendshipDao.isPendingRequest());
     }
 
 }
