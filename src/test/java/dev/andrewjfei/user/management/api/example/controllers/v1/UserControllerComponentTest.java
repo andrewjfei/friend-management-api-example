@@ -169,4 +169,26 @@ public class UserControllerComponentTest extends BaseComponentTest {
         assertEquals(expected, response.getBody());
     }
 
+    /********************* User Friend Requests APIs *********************/
+
+    @Test
+    public void testRespondToFriendRequest_returnsCorrectString() {
+        String expected = "Responded to pending friend request.";
+
+        ResponseEntity<String> response = userController.respondToFriendRequest();
+
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+    }
+
+    @Test
+    public void testFetchAllFriendRequests_returnsCorrectString() {
+        String expected = "Fetched all pending friend requests.";
+
+        ResponseEntity<String> response = userController.fetchAllFriendRequests();
+
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+    }
+
 }
