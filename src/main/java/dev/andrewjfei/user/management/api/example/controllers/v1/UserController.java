@@ -68,4 +68,20 @@ public class UserController {
         return new ResponseEntity<>(response, OK);
     }
 
+    /********************* User Friend Requests APIs *********************/
+
+    @PostMapping("/friends/requests")
+    public ResponseEntity<String> respondToFriendRequest() {
+        LOGGER.debug("Hit POST /api/v1/user/friends/requests endpoint");
+        String response = "Responded to pending friend request.";
+        return new ResponseEntity<>(response, OK);
+    }
+
+    @GetMapping("/friends/requests")
+    public ResponseEntity<String> fetchAllFriendRequests() {
+        LOGGER.debug("Hit GET /api/v1/user/friends/requests endpoint");
+        String response = "Fetched all pending friend requests.";
+        return new ResponseEntity<>(response, OK);
+    }
+
 }
