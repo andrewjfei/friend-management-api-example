@@ -26,6 +26,8 @@ public class UserFriendsService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(UserFriendsService.class);
 
+    private final String USER_NOT_FOUND_LOGGER_STRING = "User ({}) does not exist";
+
     @Autowired
     private UserRepository userRepository;
 
@@ -60,7 +62,7 @@ public class UserFriendsService {
         }
 
         if (invalidUserId != null) {
-            LOGGER.error("User ({}) does not exist", invalidUserId);
+            LOGGER.error(USER_NOT_FOUND_LOGGER_STRING, invalidUserId);
             throw new UserManagementApiExampleException(USER_NOT_FOUND, BAD_REQUEST);
         }
 
@@ -77,7 +79,7 @@ public class UserFriendsService {
         Optional<UserDao> userDaoOptional = userRepository.findById(userId);
 
         if (userDaoOptional.isEmpty()) {
-            LOGGER.error("User ({}) does not exist", userId);
+            LOGGER.error(USER_NOT_FOUND_LOGGER_STRING, userId);
             throw new UserManagementApiExampleException(USER_NOT_FOUND, BAD_REQUEST);
         }
 
@@ -91,7 +93,7 @@ public class UserFriendsService {
             Optional<UserDao> friendDaoOptional = userRepository.findById(friendId);
 
             if (friendDaoOptional.isEmpty()) {
-                LOGGER.error("User ({}) does not exist", friendId);
+                LOGGER.error(USER_NOT_FOUND_LOGGER_STRING, friendId);
                 throw new UserManagementApiExampleException(USER_NOT_FOUND, BAD_REQUEST);
             }
 
