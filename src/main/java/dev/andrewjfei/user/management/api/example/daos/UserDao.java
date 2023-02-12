@@ -1,5 +1,6 @@
 package dev.andrewjfei.user.management.api.example.daos;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -40,7 +41,7 @@ public class UserDao {
     @Column(name = "[password]", columnDefinition = "VARCHAR", nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "requester", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "requester", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<FriendshipDao> friends;
 
     @Column(name = "[created]", columnDefinition = "TIMESTAMP", nullable = false)

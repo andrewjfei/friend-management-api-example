@@ -1,6 +1,7 @@
 package dev.andrewjfei.user.management.api.example.controllers.v1;
 
 import dev.andrewjfei.user.management.api.example.services.v1.UserFriendsService;
+import dev.andrewjfei.user.management.api.example.transactions.requests.TargetUserIdRequest;
 import dev.andrewjfei.user.management.api.example.transactions.requests.UserIdRequest;
 import dev.andrewjfei.user.management.api.example.transactions.responses.BasicUserResponse;
 import java.util.List;
@@ -44,10 +45,12 @@ public class UserController {
     /********************* User Friends APIs *********************/
 
     @PostMapping("/friends/add")
-    public ResponseEntity<String> addFriend() {
+    public ResponseEntity addFriend(@RequestBody TargetUserIdRequest request) {
         LOGGER.debug("Hit POST /api/v1/user/friends/add endpoint");
-        String response = "Friend request sent.";
-        return new ResponseEntity<>(response, OK);
+        UUID requesterId = UUID.fromString(request.userId());
+        UUID receiverId = UUID.fromString(request.targetUserId());
+        userFriendsService.sendFriendRequest(requesterId, receiverId);
+        return new ResponseEntity<>(OK);
     }
 
     @GetMapping("/friends")

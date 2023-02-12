@@ -3,8 +3,10 @@ package dev.andrewjfei.user.management.api.example.services.v1;
 import dev.andrewjfei.user.management.api.example.daos.FriendshipDao;
 import dev.andrewjfei.user.management.api.example.daos.UserDao;
 import dev.andrewjfei.user.management.api.example.exceptions.UserManagementApiExampleException;
+import dev.andrewjfei.user.management.api.example.repositories.v1.FriendshipRepository;
 import dev.andrewjfei.user.management.api.example.repositories.v1.UserRepository;
 import dev.andrewjfei.user.management.api.example.transactions.responses.BasicUserResponse;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,10 +28,41 @@ public class UserFriendsService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private FriendshipRepository friendshipRepository;
+
     public UserFriendsService() {
 
     }
 
+    public void sendFriendRequest(UUID requesterId, UUID receiverId) {
+        Optional<UserDao> requesterDaoOptional = userRepository.findById(requesterId);
+        Optional<UserDao> receiverDaoOptional = userRepository.findById(receiverId);
+
+        Iterable<UserDao> userList = userRepository.findAll();
+
+        UUID invalidUserId = null;
+
+        if (requesterDaoOptional.isEmpty()) {
+            invalidUserId = requesterId;
+        } else if (receiverDaoOptional.isEmpty()) {
+            invalidUserId = receiverId;
+        }
+
+        if (invalidUserId != null) {
+            LOGGER.error("User ({}) does not exist", invalidUserId);
+            throw new UserManagementApiExampleException(USER_NOT_FOUND, BAD_REQUEST);
+        }
+
+        UserDao requesterDao = requesterDaoOptional.get();
+        UserDao receiverDao = receiverDaoOptional.get();
+
+        FriendshipDao friendshipDao = new FriendshipDao(requesterDao, receiverDao);
+
+        friendshipRepository.save(friendshipDao);
+    }
+
+    @Transactional
     public List<BasicUserResponse> retrieveAllFriends(UUID userId) {
         Optional<UserDao> userDaoOptional = userRepository.findById(userId);
 
