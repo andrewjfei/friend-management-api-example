@@ -13,11 +13,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "[friendship]")
-@Where(clause = "is_accepted")
 @Getter
 @Setter
 @ToString
@@ -52,6 +50,10 @@ public class FriendshipDao {
         this.receiver = receiver;
         this.isAccepted = false;
         this.created = LocalDateTime.now();
+    }
+
+    public boolean isPendingRequest() {
+        return !isAccepted;
     }
 
 }

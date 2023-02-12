@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_ERROR;
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND;
 import static dev.andrewjfei.user.management.api.example.utils.MapperUtil.toBasicUserResponse;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -36,10 +37,19 @@ public class UserFriendsService {
     }
 
     public void sendFriendRequest(UUID requesterId, UUID receiverId) {
+        FriendshipDao friendshipDao = friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
+
+        if (friendshipDao != null) {
+            LOGGER.info(
+                    "User ({}) has either already sent a friend request to User ({}) or are already friends",
+                    requesterId,
+                    receiverId
+            );
+            throw new UserManagementApiExampleException(USER_FRIEND_REQUEST_ERROR, BAD_REQUEST);
+        }
+
         Optional<UserDao> requesterDaoOptional = userRepository.findById(requesterId);
         Optional<UserDao> receiverDaoOptional = userRepository.findById(receiverId);
-
-        Iterable<UserDao> userList = userRepository.findAll();
 
         UUID invalidUserId = null;
 
@@ -57,9 +67,9 @@ public class UserFriendsService {
         UserDao requesterDao = requesterDaoOptional.get();
         UserDao receiverDao = receiverDaoOptional.get();
 
-        FriendshipDao friendshipDao = new FriendshipDao(requesterDao, receiverDao);
+        FriendshipDao newFriendshipDao = new FriendshipDao(requesterDao, receiverDao);
 
-        friendshipRepository.save(friendshipDao);
+        friendshipRepository.save(newFriendshipDao);
     }
 
     @Transactional

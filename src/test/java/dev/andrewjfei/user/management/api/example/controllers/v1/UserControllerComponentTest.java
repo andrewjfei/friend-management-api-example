@@ -17,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -71,29 +73,11 @@ public class UserControllerComponentTest extends BaseComponentTest {
         // Then
         assertEquals(OK, response.getStatusCode());
 
-//        Optional<UserDao> requesterDaoOptional = userRepository.findById(UUID.fromString(JOE_SMITH_USER_ID));
-//        Optional<UserDao> receiverDaoOptional = userRepository.findById(UUID.fromString(ALEX_CHEN_USER_ID));
-//
-//        UUID invalidUserId = null;
-//
-//        if (requesterDaoOptional.isEmpty()) {
-//            invalidUserId = UUID.fromString(JOE_SMITH_USER_ID);
-//        } else if (receiverDaoOptional.isEmpty()) {
-//            invalidUserId = UUID.fromString(ALEX_CHEN_USER_ID);
-//        }
-//
-//        if (invalidUserId != null) {
-//            fail("User (" + invalidUserId + ") does not exist");
-//        }
-//
-//        UserDao requesterDao = requesterDaoOptional.get();
-//        UserDao receiverDao = receiverDaoOptional.get();
+        FriendshipDao friendshipDao =
+                friendshipRepository.findByRequesterIdAndReceiverId(UUID.fromString(JOE_SMITH_USER_ID), UUID.fromString(ALEX_CHEN_USER_ID));
 
-//        FriendshipDao friendshipDao =
-//                friendshipRepository.findByRequesterIdAndReceiverId(UUID.fromString(JOE_SMITH_USER_ID), UUID.fromString(ALEX_CHEN_USER_ID));
-
-//        assertFalse(friendshipDao.isAccepted());
-//        assertTrue(friendshipDao.getCreated().isAfter(now));
+        assertFalse(friendshipDao.isAccepted());
+        assertTrue(friendshipDao.getCreated().isAfter(now));
     }
 
     @Test
