@@ -78,9 +78,10 @@ public class UserController {
     }
 
     @GetMapping("/friends/requests")
-    public ResponseEntity<String> fetchAllFriendRequests() {
+    public ResponseEntity<List<BasicUserResponse>> fetchAllFriendRequests(@RequestBody UserIdRequest request) {
         LOGGER.debug("Hit GET /api/v1/user/friends/requests endpoint");
-        String response = "Fetched all pending friend requests.";
+        UUID userId = UUID.fromString(request.userId());
+        List<BasicUserResponse> response = userFriendsService.retrieveAllFriendRequests(userId);
         return new ResponseEntity<>(response, OK);
     }
 
