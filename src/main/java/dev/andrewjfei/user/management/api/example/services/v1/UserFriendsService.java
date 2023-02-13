@@ -38,6 +38,8 @@ public class UserFriendsService {
 
     }
 
+    /********************* User Friends Methods *********************/
+
     public void sendFriendRequest(UUID requesterId, UUID receiverId) {
         FriendshipDao friendshipDao = friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
 
@@ -100,6 +102,21 @@ public class UserFriendsService {
             UserDao friendDao = friendDaoOptional.get();
 
             response.add(toBasicUserResponse(friendDao));
+        }
+
+        return response;
+    }
+
+    /********************* User Friend Requests Methods *********************/
+
+    public List<BasicUserResponse> retrieveAllFriendRequests(UUID userId) {
+        List<FriendshipDao> friendshipDaoList = friendshipRepository
+                .findByReceiverIdAndIsAccepted(userId, false);
+
+        List<BasicUserResponse> response = new ArrayList<>();
+
+        for (FriendshipDao friendshipDao : friendshipDaoList) {
+            response.add(toBasicUserResponse(friendshipDao.getRequester()));
         }
 
         return response;

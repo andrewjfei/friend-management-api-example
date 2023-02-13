@@ -40,6 +40,8 @@ public class UserControllerComponentTest extends BaseComponentTest {
 
     private final int JOE_SMITH_NUM_OF_FRIENDS = 1;
 
+    private final int JOE_SMITH_NUM_OF_FRIEND_REQUESTS = 2;
+
     // Casey Wang
 
     private final String CASEY_WANG_USER_ID = "26770bad-887c-4ef7-a77c-f582d50e201c";
@@ -183,12 +185,17 @@ public class UserControllerComponentTest extends BaseComponentTest {
 
     @Test
     public void testFetchAllFriendRequests_returnsCorrectString() {
-        String expected = "Fetched all pending friend requests.";
+        // Given
+        UserIdRequest request = new UserIdRequest(JOE_SMITH_USER_ID);
 
-        ResponseEntity<String> response = userController.fetchAllFriendRequests();
+        // When
+        ResponseEntity<List<BasicUserResponse>> response = userController.fetchAllFriendRequests(request);
+
+        // Then
+        List<BasicUserResponse> userFriendsList = response.getBody();
 
         assertEquals(OK, response.getStatusCode());
-        assertEquals(expected, response.getBody());
+        assertEquals(JOE_SMITH_NUM_OF_FRIEND_REQUESTS, userFriendsList.size());
     }
 
 }
