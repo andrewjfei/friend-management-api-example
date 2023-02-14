@@ -20,6 +20,7 @@ import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_NOT_FOUND_ERROR;
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_NOT_PENDING_ERROR;
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND_ERROR;
+import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FRIENDS_ERROR;
 import static dev.andrewjfei.user.management.api.example.utils.MapperUtil.toBasicUserResponse;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -96,6 +97,31 @@ public class UserFriendsService {
         return response;
     }
 
+    /**
+     * This method breaks the relation between two {@code UserDao} objects. If both the requester and receiver are
+     * existing friends, then both {@code FriendshipDao} records will be removed from the database table.
+     * @param requesterId the user who initiated the friend removal
+     * @param receiverId the target user to be removed
+     */
+    public void deleteFriend(UUID requesterId, UUID receiverId) {
+        Optional<FriendshipDao> friendshipDaoOptional =
+                friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
+
+        Optional<FriendshipDao> reverseFriendshipDaoOptional =
+                friendshipRepository.findByRequesterIdAndReceiverId(receiverId, requesterId);
+
+        if (friendshipDaoOptional.isEmpty() || reverseFriendshipDaoOptional.isEmpty()) {
+            LOGGER.error(FRIENDSHIP_NOT_FOUND_LOGGER_STRING, requesterId, receiverId);
+            throw new UserManagementApiExampleException(USER_NOT_FRIENDS_ERROR, BAD_REQUEST);
+        }
+
+        FriendshipDao friendshipDao = friendshipDaoOptional.get();
+        FriendshipDao reverseFriendshipDao = reverseFriendshipDaoOptional.get();
+
+        friendshipRepository.deleteById(friendshipDao.getId());
+        friendshipRepository.deleteById(reverseFriendshipDao.getId());
+    }
+
     /********************* User Friend Requests Methods *********************/
 
     public void acceptFriendRequest(UUID receiverId, UUID requesterId) {
@@ -165,8 +191,8 @@ public class UserFriendsService {
      * <br>
      * For example, if you have a {@code FriendshipDao}
      * then that should be used to get related {@code UserDao} objects instead of calling this method.
-     * @param requesterId
-     * @param receiverId
+     * @param requesterId the user who initiated the friend request
+     * @param receiverId the target user who the requester is trying to befriend
      * @return a {@code FriendshipDao} object which can be used to persist data into the database
      */
     public FriendshipDao createFriendshipDao(UUID requesterId, UUID receiverId) {

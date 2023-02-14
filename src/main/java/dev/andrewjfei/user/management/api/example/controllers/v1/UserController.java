@@ -65,9 +65,12 @@ public class UserController {
     }
 
     @DeleteMapping("/friends/remove")
-    public ResponseEntity<String> removeFriend() {
+    public ResponseEntity<BasicMessageResponse> removeFriend(@RequestBody TargetUserIdRequest request) {
         LOGGER.debug("Hit DELETE /api/v1/user/friends/remove endpoint");
-        String response = "Friend Removed.";
+        UUID requesterId = UUID.fromString(request.userId());
+        UUID receiverId = UUID.fromString(request.targetUserId());
+        userFriendsService.deleteFriend(requesterId, receiverId);
+        BasicMessageResponse response = new BasicMessageResponse("Friend has been successfully removed.");
         return new ResponseEntity<>(response, OK);
     }
 

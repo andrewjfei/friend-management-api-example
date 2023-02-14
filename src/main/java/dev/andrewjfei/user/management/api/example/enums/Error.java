@@ -8,7 +8,8 @@ public enum Error {
     USER_NOT_FOUND_ERROR(1, "The user does not exist."),
     USER_FRIEND_REQUEST_ERROR(2, "The user either has a current pending friend request or is already friends."),
     USER_FRIEND_REQUEST_NOT_FOUND_ERROR(3, "The friend request between the requester and receiver does not exist"),
-    USER_FRIEND_REQUEST_NOT_PENDING_ERROR(4, "The requester and receiver are already friends and have no pending friend request");
+    USER_FRIEND_REQUEST_NOT_PENDING_ERROR(4, "The requester and receiver are already friends and have no pending friend request"),
+    USER_NOT_FRIENDS_ERROR(5, "The requester and receiver are not existing friends");
 
     private final int errorCode;
     private final String message;
