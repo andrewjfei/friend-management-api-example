@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static dev.andrewjfei.user.management.api.example.enums.Error.FRIENDSHIP_NOT_FOUND;
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_ERROR;
+import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_NOT_FOUND_ERROR;
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_NOT_PENDING_ERROR;
-import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND;
+import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND_ERROR;
 import static dev.andrewjfei.user.management.api.example.utils.MapperUtil.toBasicUserResponse;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -71,7 +71,7 @@ public class UserFriendsService {
 
         if (userDaoOptional.isEmpty()) {
             LOGGER.error(USER_NOT_FOUND_LOGGER_STRING, userId);
-            throw new UserManagementApiExampleException(USER_NOT_FOUND, BAD_REQUEST);
+            throw new UserManagementApiExampleException(USER_NOT_FOUND_ERROR, BAD_REQUEST);
         }
 
         UserDao userDao = userDaoOptional.get();
@@ -85,7 +85,7 @@ public class UserFriendsService {
 
             if (friendDaoOptional.isEmpty()) {
                 LOGGER.error(USER_NOT_FOUND_LOGGER_STRING, friendId);
-                throw new UserManagementApiExampleException(USER_NOT_FOUND, BAD_REQUEST);
+                throw new UserManagementApiExampleException(USER_NOT_FOUND_ERROR, BAD_REQUEST);
             }
 
             UserDao friendDao = friendDaoOptional.get();
@@ -104,7 +104,7 @@ public class UserFriendsService {
 
         if (friendshipDaoOptional.isEmpty()) {
             LOGGER.error(FRIENDSHIP_NOT_FOUND_LOGGER_STRING, requesterId, receiverId);
-            throw new UserManagementApiExampleException(FRIENDSHIP_NOT_FOUND, BAD_REQUEST);
+            throw new UserManagementApiExampleException(USER_FRIEND_REQUEST_NOT_FOUND_ERROR, BAD_REQUEST);
         }
 
         FriendshipDao friendshipDao = friendshipDaoOptional.get();
@@ -129,7 +129,7 @@ public class UserFriendsService {
 
         if (friendshipDaoOptional.isEmpty()) {
             LOGGER.error(FRIENDSHIP_NOT_FOUND_LOGGER_STRING, requesterId, receiverId);
-            throw new UserManagementApiExampleException(FRIENDSHIP_NOT_FOUND, BAD_REQUEST);
+            throw new UserManagementApiExampleException(USER_FRIEND_REQUEST_NOT_FOUND_ERROR, BAD_REQUEST);
         }
 
         FriendshipDao friendshipDao = friendshipDaoOptional.get();
@@ -183,7 +183,7 @@ public class UserFriendsService {
 
         if (invalidUserId != null) {
             LOGGER.error(USER_NOT_FOUND_LOGGER_STRING, invalidUserId);
-            throw new UserManagementApiExampleException(USER_NOT_FOUND, BAD_REQUEST);
+            throw new UserManagementApiExampleException(USER_NOT_FOUND_ERROR, BAD_REQUEST);
         }
 
         UserDao requesterDao = requesterDaoOptional.get();

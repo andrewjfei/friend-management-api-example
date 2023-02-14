@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_ERROR;
-import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND;
+import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_NOT_FOUND_ERROR;
+import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_NOT_PENDING_ERROR;
+import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -127,7 +129,7 @@ public class UserControllerComponentTest extends BaseComponentTest {
                 assertThrows(UserManagementApiExampleException.class, () ->  userController.addFriend(request));
 
         assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
-        assertEquals(USER_NOT_FOUND, userManagementApiExampleException.getError());
+        assertEquals(USER_NOT_FOUND_ERROR, userManagementApiExampleException.getError());
     }
 
     @Test
@@ -142,7 +144,7 @@ public class UserControllerComponentTest extends BaseComponentTest {
                 assertThrows(UserManagementApiExampleException.class, () ->  userController.addFriend(request));
 
         assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
-        assertEquals(USER_NOT_FOUND, userManagementApiExampleException.getError());
+        assertEquals(USER_NOT_FOUND_ERROR, userManagementApiExampleException.getError());
     }
 
     @Test
@@ -172,7 +174,7 @@ public class UserControllerComponentTest extends BaseComponentTest {
                 assertThrows(UserManagementApiExampleException.class, () ->  userController.fetchAllFriends(request));
 
         assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
-        assertEquals(USER_NOT_FOUND, userManagementApiExampleException.getError());
+        assertEquals(USER_NOT_FOUND_ERROR, userManagementApiExampleException.getError());
     }
 
     @Test
@@ -222,6 +224,44 @@ public class UserControllerComponentTest extends BaseComponentTest {
     }
 
     @Test
+    public void testRespondToFriendRequest_receiverAccepted_friendRequestNotFound_throwsException() {
+        // Given
+        boolean hasAccepted = true;
+        UUID requesterId = UUID.fromString(ALEX_CHEN_USER_ID);
+        UUID receiverId = UUID.fromString(CASEY_WANG_USER_ID);
+
+        FriendRequestResponseRequest request =
+                new FriendRequestResponseRequest(receiverId.toString(), requesterId.toString(), hasAccepted);
+
+        // When
+        // Then
+        UserManagementApiExampleException userManagementApiExampleException =
+                assertThrows(UserManagementApiExampleException.class, () ->  userController.respondToFriendRequest(request));
+
+        assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
+        assertEquals(USER_FRIEND_REQUEST_NOT_FOUND_ERROR, userManagementApiExampleException.getError());
+    }
+
+    @Test
+    public void testRespondToFriendRequest_receiverAccepted_friendRequestNotPending_throwsException() {
+        // Given
+        boolean hasAccepted = true;
+        UUID requesterId = UUID.fromString(CASEY_WANG_USER_ID);
+        UUID receiverId = UUID.fromString(JOE_SMITH_USER_ID);
+
+        FriendRequestResponseRequest request =
+                new FriendRequestResponseRequest(receiverId.toString(), requesterId.toString(), hasAccepted);
+
+        // When
+        // Then
+        UserManagementApiExampleException userManagementApiExampleException =
+                assertThrows(UserManagementApiExampleException.class, () ->  userController.respondToFriendRequest(request));
+
+        assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
+        assertEquals(USER_FRIEND_REQUEST_NOT_PENDING_ERROR, userManagementApiExampleException.getError());
+    }
+
+    @Test
     public void testRespondToFriendRequest_receiverDeclined_returnsCorrectResponse() {
         // Given
         boolean hasAccepted = false;
@@ -241,6 +281,44 @@ public class UserControllerComponentTest extends BaseComponentTest {
                 friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
 
         assertTrue(friendshipDaoOptional.isEmpty());
+    }
+
+    @Test
+    public void testRespondToFriendRequest_receiverDeclined_friendRequestNotFound_throwsException() {
+        // Given
+        boolean hasAccepted = false;
+        UUID requesterId = UUID.fromString(ALEX_CHEN_USER_ID);
+        UUID receiverId = UUID.fromString(CASEY_WANG_USER_ID);
+
+        FriendRequestResponseRequest request =
+                new FriendRequestResponseRequest(receiverId.toString(), requesterId.toString(), hasAccepted);
+
+        // When
+        // Then
+        UserManagementApiExampleException userManagementApiExampleException =
+                assertThrows(UserManagementApiExampleException.class, () ->  userController.respondToFriendRequest(request));
+
+        assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
+        assertEquals(USER_FRIEND_REQUEST_NOT_FOUND_ERROR, userManagementApiExampleException.getError());
+    }
+
+    @Test
+    public void testRespondToFriendRequest_receiverDeclined_friendRequestNotPending_throwsException() {
+        // Given
+        boolean hasAccepted = false;
+        UUID requesterId = UUID.fromString(CASEY_WANG_USER_ID);
+        UUID receiverId = UUID.fromString(JOE_SMITH_USER_ID);
+
+        FriendRequestResponseRequest request =
+                new FriendRequestResponseRequest(receiverId.toString(), requesterId.toString(), hasAccepted);
+
+        // When
+        // Then
+        UserManagementApiExampleException userManagementApiExampleException =
+                assertThrows(UserManagementApiExampleException.class, () ->  userController.respondToFriendRequest(request));
+
+        assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
+        assertEquals(USER_FRIEND_REQUEST_NOT_PENDING_ERROR, userManagementApiExampleException.getError());
     }
 
     @Test
