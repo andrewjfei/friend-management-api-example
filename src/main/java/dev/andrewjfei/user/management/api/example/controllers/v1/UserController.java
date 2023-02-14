@@ -1,8 +1,10 @@
 package dev.andrewjfei.user.management.api.example.controllers.v1;
 
 import dev.andrewjfei.user.management.api.example.services.v1.UserFriendsService;
+import dev.andrewjfei.user.management.api.example.transactions.requests.FriendRequestResponseRequest;
 import dev.andrewjfei.user.management.api.example.transactions.requests.TargetUserIdRequest;
 import dev.andrewjfei.user.management.api.example.transactions.requests.UserIdRequest;
+import dev.andrewjfei.user.management.api.example.transactions.responses.BasicMessageResponse;
 import dev.andrewjfei.user.management.api.example.transactions.responses.BasicUserResponse;
 import java.util.List;
 import java.util.UUID;
@@ -45,12 +47,13 @@ public class UserController {
     /********************* User Friends APIs *********************/
 
     @PostMapping("/friends/add")
-    public ResponseEntity addFriend(@RequestBody TargetUserIdRequest request) {
+    public ResponseEntity<BasicMessageResponse> addFriend(@RequestBody TargetUserIdRequest request) {
         LOGGER.debug("Hit POST /api/v1/user/friends/add endpoint");
         UUID requesterId = UUID.fromString(request.userId());
         UUID receiverId = UUID.fromString(request.targetUserId());
         userFriendsService.sendFriendRequest(requesterId, receiverId);
-        return new ResponseEntity<>(OK);
+        BasicMessageResponse response = new BasicMessageResponse("Friend request successfully sent.");
+        return new ResponseEntity<>(response, OK);
     }
 
     @GetMapping("/friends")
@@ -71,9 +74,22 @@ public class UserController {
     /********************* User Friend Requests APIs *********************/
 
     @PostMapping("/friends/requests")
-    public ResponseEntity<String> respondToFriendRequest() {
+    public ResponseEntity<BasicMessageResponse> respondToFriendRequest(@RequestBody FriendRequestResponseRequest request) {
         LOGGER.debug("Hit POST /api/v1/user/friends/requests endpoint");
-        String response = "Responded to pending friend request.";
+
+        UUID receiverId = UUID.fromString(request.receiverId());
+        UUID requesterId = UUID.fromString(request.requesterId());
+
+        BasicMessageResponse response;
+
+        if (request.hasAccepted()) {
+            userFriendsService.acceptFriendRequest(receiverId, requesterId);
+            response = new BasicMessageResponse("Accepted friend request successfully.");
+        } else {
+            userFriendsService.declineFriendRequest(receiverId, requesterId);
+            response = new BasicMessageResponse("Declined friend request successfully.");
+        }
+
         return new ResponseEntity<>(response, OK);
     }
 
