@@ -49,10 +49,10 @@ public class UserFriendsService {
     /********************* User Friends Methods *********************/
 
     public void sendFriendRequest(UUID requesterId, UUID receiverId) {
-        FriendshipDao friendshipDao = friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
+        Optional<FriendshipDao> friendshipDaoOptional = friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
 
-        if (friendshipDao != null) {
-            LOGGER.info(
+        if (friendshipDaoOptional.isPresent()) {
+            LOGGER.error(
                     "User ({}) has either already sent a friend request to User ({}) or are already friends",
                     requesterId,
                     receiverId
@@ -99,16 +99,17 @@ public class UserFriendsService {
     /********************* User Friend Requests Methods *********************/
 
     public void acceptFriendRequest(UUID receiverId, UUID requesterId) {
-        FriendshipDao friendshipDao = friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
+        Optional<FriendshipDao> friendshipDaoOptional = friendshipRepository
+                .findByRequesterIdAndReceiverId(requesterId, receiverId);
 
-        if (friendshipDao == null) {
-            // TODO: Throw Exception (Friendship Not Found)
+        if (friendshipDaoOptional.isEmpty()) {
             LOGGER.error(FRIENDSHIP_NOT_FOUND_LOGGER_STRING, requesterId, receiverId);
             throw new UserManagementApiExampleException(FRIENDSHIP_NOT_FOUND, BAD_REQUEST);
         }
 
+        FriendshipDao friendshipDao = friendshipDaoOptional.get();
+
         if (friendshipDao.isAccepted()) {
-            // TODO: Throw Exception (Already Accepted Friend Request)
             LOGGER.error(FRIEND_REQUEST_NOT_PENDING_LOGGER_STRING, requesterId, receiverId);
             throw new UserManagementApiExampleException(USER_FRIEND_REQUEST_NOT_PENDING_ERROR, BAD_REQUEST);
         }
@@ -116,7 +117,7 @@ public class UserFriendsService {
         // Accept friendship and create reverse friendship record to ensure bidirectional relation
         friendshipDao.setAccepted(true);
 
-        FriendshipDao reverseFriendshipDao = createFriendshipDao(receiverId, requesterId);
+        FriendshipDao reverseFriendshipDao = new FriendshipDao(friendshipDao.getReceiver(), friendshipDao.getRequester());
         reverseFriendshipDao.setAccepted(true);
 
         friendshipRepository.save(friendshipDao);
@@ -124,16 +125,16 @@ public class UserFriendsService {
     }
 
     public void declineFriendRequest(UUID receiverId, UUID requesterId) {
-        FriendshipDao friendshipDao = friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
+        Optional<FriendshipDao> friendshipDaoOptional = friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
 
-        if (friendshipDao == null) {
-            // TODO: Throw Exception (Friendship Not Found)
+        if (friendshipDaoOptional.isEmpty()) {
             LOGGER.error(FRIENDSHIP_NOT_FOUND_LOGGER_STRING, requesterId, receiverId);
             throw new UserManagementApiExampleException(FRIENDSHIP_NOT_FOUND, BAD_REQUEST);
         }
 
+        FriendshipDao friendshipDao = friendshipDaoOptional.get();
+
         if (friendshipDao.isAccepted()) {
-            // TODO: Throw Exception (Already Accepted Friend Request)
             LOGGER.error(FRIEND_REQUEST_NOT_PENDING_LOGGER_STRING, requesterId, receiverId);
             throw new UserManagementApiExampleException(USER_FRIEND_REQUEST_NOT_PENDING_ERROR, BAD_REQUEST);
         }
@@ -157,6 +158,17 @@ public class UserFriendsService {
 
     /********************* Helper Methods *********************/
 
+    /**
+     * This method should only be used only in the circumstance where only a {@code UserDao} id is provided, and you do
+     * not have any other means of obtaining a {@code UserDao} object.
+     * <br>
+     * <br>
+     * For example, if you have a {@code FriendshipDao}
+     * then that should be used to get related {@code UserDao} objects instead of calling this method.
+     * @param requesterId
+     * @param receiverId
+     * @return a {@code FriendshipDao} object which can be used to persist data into the database
+     */
     public FriendshipDao createFriendshipDao(UUID requesterId, UUID receiverId) {
         Optional<UserDao> requesterDaoOptional = userRepository.findById(requesterId);
         Optional<UserDao> receiverDaoOptional = userRepository.findById(receiverId);

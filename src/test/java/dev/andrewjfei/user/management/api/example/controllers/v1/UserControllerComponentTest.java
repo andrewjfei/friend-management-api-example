@@ -12,6 +12,7 @@ import dev.andrewjfei.user.management.api.example.transactions.responses.BasicMe
 import dev.andrewjfei.user.management.api.example.transactions.responses.BasicUserResponse;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
@@ -22,9 +23,9 @@ import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -84,11 +85,17 @@ public class UserControllerComponentTest extends BaseComponentTest {
         // Then
         assertEquals(OK, response.getStatusCode());
 
-        FriendshipDao friendshipDao =
+        Optional<FriendshipDao> friendshipDaoOptional =
                 friendshipRepository.findByRequesterIdAndReceiverId(
                         UUID.fromString(JOE_SMITH_USER_ID),
                         UUID.fromString(ALEX_CHEN_USER_ID)
                 );
+
+        if (friendshipDaoOptional.isEmpty()) {
+            fail("Friendship record does not exist");
+        }
+
+        FriendshipDao friendshipDao = friendshipDaoOptional.get();
 
         assertFalse(friendshipDao.isAccepted());
         assertTrue(friendshipDao.getCreated().isAfter(now));
@@ -196,11 +203,18 @@ public class UserControllerComponentTest extends BaseComponentTest {
         // Then
         assertEquals(OK, response.getStatusCode());
 
-        FriendshipDao friendshipDao =
+        Optional<FriendshipDao> friendshipDaoOptional =
                 friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
 
-        FriendshipDao reverseFriendshipDao =
+        Optional<FriendshipDao> reverseFriendshipDaoOptional =
                 friendshipRepository.findByRequesterIdAndReceiverId(receiverId, requesterId);
+
+        if (friendshipDaoOptional.isEmpty() || reverseFriendshipDaoOptional.isEmpty()) {
+            fail("Friendship record does not exist");
+        }
+
+        FriendshipDao friendshipDao = friendshipDaoOptional.get();
+        FriendshipDao reverseFriendshipDao = reverseFriendshipDaoOptional.get();
 
         assertTrue(friendshipDao.isAccepted());
         assertTrue(reverseFriendshipDao.isAccepted());
@@ -223,10 +237,10 @@ public class UserControllerComponentTest extends BaseComponentTest {
         // Then
         assertEquals(OK, response.getStatusCode());
 
-        FriendshipDao friendshipDao =
+        Optional<FriendshipDao> friendshipDaoOptional =
                 friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
 
-        assertNull(friendshipDao);
+        assertTrue(friendshipDaoOptional.isEmpty());
     }
 
     @Test
