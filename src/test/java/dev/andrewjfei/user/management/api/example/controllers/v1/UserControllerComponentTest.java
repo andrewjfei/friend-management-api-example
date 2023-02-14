@@ -5,12 +5,15 @@ import dev.andrewjfei.user.management.api.example.daos.FriendshipDao;
 import dev.andrewjfei.user.management.api.example.exceptions.UserManagementApiExampleException;
 import dev.andrewjfei.user.management.api.example.repositories.v1.FriendshipRepository;
 import dev.andrewjfei.user.management.api.example.repositories.v1.UserRepository;
+import dev.andrewjfei.user.management.api.example.transactions.requests.FriendRequestResponseRequest;
 import dev.andrewjfei.user.management.api.example.transactions.requests.TargetUserIdRequest;
 import dev.andrewjfei.user.management.api.example.transactions.requests.UserIdRequest;
+import dev.andrewjfei.user.management.api.example.transactions.responses.BasicMessageResponse;
 import dev.andrewjfei.user.management.api.example.transactions.responses.BasicUserResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,7 @@ import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -69,19 +73,22 @@ public class UserControllerComponentTest extends BaseComponentTest {
     /********************* User Friends APIs *********************/
 
     @Test
-    public void testAddFriend_returnsCorrectString() {
+    public void testAddFriend_returnsCorrectResponse() {
         // Given
         LocalDateTime now = LocalDateTime.now();
         TargetUserIdRequest request = new TargetUserIdRequest(JOE_SMITH_USER_ID, ALEX_CHEN_USER_ID);
 
         // When
-        ResponseEntity<String> response = userController.addFriend(request);
+        ResponseEntity<BasicMessageResponse> response = userController.addFriend(request);
 
         // Then
         assertEquals(OK, response.getStatusCode());
 
         FriendshipDao friendshipDao =
-                friendshipRepository.findByRequesterIdAndReceiverId(UUID.fromString(JOE_SMITH_USER_ID), UUID.fromString(ALEX_CHEN_USER_ID));
+                friendshipRepository.findByRequesterIdAndReceiverId(
+                        UUID.fromString(JOE_SMITH_USER_ID),
+                        UUID.fromString(ALEX_CHEN_USER_ID)
+                );
 
         assertFalse(friendshipDao.isAccepted());
         assertTrue(friendshipDao.getCreated().isAfter(now));
@@ -174,17 +181,56 @@ public class UserControllerComponentTest extends BaseComponentTest {
     /********************* User Friend Requests APIs *********************/
 
     @Test
-    public void testRespondToFriendRequest_returnsCorrectString() {
-        String expected = "Responded to pending friend request.";
+    public void testRespondToFriendRequest_receiverAccepted_returnsCorrectResponse() {
+        // Given
+        boolean hasAccepted = true;
+        UUID requesterId = UUID.fromString(ALEX_CHEN_USER_ID);
+        UUID receiverId = UUID.fromString(JOE_SMITH_USER_ID);
 
-        ResponseEntity<String> response = userController.respondToFriendRequest();
+        FriendRequestResponseRequest request =
+                new FriendRequestResponseRequest(receiverId.toString(), requesterId.toString(), hasAccepted);
 
+        // When
+        ResponseEntity<BasicMessageResponse> response = userController.respondToFriendRequest(request);
+
+        // Then
         assertEquals(OK, response.getStatusCode());
-        assertEquals(expected, response.getBody());
+
+        FriendshipDao friendshipDao =
+                friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
+
+        FriendshipDao reverseFriendshipDao =
+                friendshipRepository.findByRequesterIdAndReceiverId(receiverId, requesterId);
+
+        assertTrue(friendshipDao.isAccepted());
+        assertTrue(reverseFriendshipDao.isAccepted());
+        assertTrue(reverseFriendshipDao.getCreated().isAfter(friendshipDao.getCreated()));
     }
 
     @Test
-    public void testFetchAllFriendRequests_returnsCorrectString() {
+    public void testRespondToFriendRequest_receiverDeclined_returnsCorrectResponse() {
+        // Given
+        boolean hasAccepted = false;
+        UUID requesterId = UUID.fromString(ALEX_CHEN_USER_ID);
+        UUID receiverId = UUID.fromString(JOE_SMITH_USER_ID);
+
+        FriendRequestResponseRequest request =
+                new FriendRequestResponseRequest(receiverId.toString(), requesterId.toString(), hasAccepted);
+
+        // When
+        ResponseEntity<BasicMessageResponse> response = userController.respondToFriendRequest(request);
+
+        // Then
+        assertEquals(OK, response.getStatusCode());
+
+        FriendshipDao friendshipDao =
+                friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
+
+        assertNull(friendshipDao);
+    }
+
+    @Test
+    public void testFetchAllFriendRequests_returnsCorrectResponse() {
         // Given
         UserIdRequest request = new UserIdRequest(JOE_SMITH_USER_ID);
 
@@ -194,6 +240,7 @@ public class UserControllerComponentTest extends BaseComponentTest {
         // Then
         List<BasicUserResponse> userFriendsList = response.getBody();
 
+        assertTrue(CollectionUtils.isNotEmpty(userFriendsList));
         assertEquals(OK, response.getStatusCode());
         assertEquals(JOE_SMITH_NUM_OF_FRIEND_REQUESTS, userFriendsList.size());
     }

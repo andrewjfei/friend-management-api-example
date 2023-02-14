@@ -36,6 +36,9 @@
         <!-- Lombok Properties -->
         <lombok.version>1.18.24</lombok.version>
 
+        <!-- Apache Properties -->
+        <apache.commons.collections.version>4.4</apache.commons.collections.version>
+
         <!-- Sonar Properties -->
         <sonar.version>3.9.1.2184</sonar.version>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -85,6 +88,13 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <optional>true</optional>
+        </dependency>
+
+        <!-- Apache Commons Collections -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${apache.commons.collections.version}</version>
         </dependency>
 
         <!-- ===== Test Dependencies ===== -->
