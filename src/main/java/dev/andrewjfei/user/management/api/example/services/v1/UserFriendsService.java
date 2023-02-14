@@ -31,6 +31,9 @@ public class UserFriendsService {
 
     private final String USER_NOT_FOUND_LOGGER_STRING = "User ({}) does not exist";
 
+    private final String USER_NOT_FRIENDS_LOGGER_STRING =
+            "Requester [User] ({}) is not a of friend receiver [User] ({})";
+
     private final String FRIENDSHIP_NOT_FOUND_LOGGER_STRING =
             "Friendship with requester [User] ({}) and receiver [User] ({}) does not exist";
 
@@ -50,7 +53,8 @@ public class UserFriendsService {
     /********************* User Friends Methods *********************/
 
     public void sendFriendRequest(UUID requesterId, UUID receiverId) {
-        Optional<FriendshipDao> friendshipDaoOptional = friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
+        Optional<FriendshipDao> friendshipDaoOptional =
+                friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
 
         if (friendshipDaoOptional.isPresent()) {
             LOGGER.error(
@@ -110,8 +114,19 @@ public class UserFriendsService {
         Optional<FriendshipDao> reverseFriendshipDaoOptional =
                 friendshipRepository.findByRequesterIdAndReceiverId(receiverId, requesterId);
 
-        if (friendshipDaoOptional.isEmpty() || reverseFriendshipDaoOptional.isEmpty()) {
-            LOGGER.error(FRIENDSHIP_NOT_FOUND_LOGGER_STRING, requesterId, receiverId);
+        boolean doesFriendshipExist = friendshipDaoOptional.isPresent() && reverseFriendshipDaoOptional.isPresent();
+
+        boolean isFriendshipPending = true;
+
+        if (doesFriendshipExist) {
+            isFriendshipPending = friendshipDaoOptional.get().isPendingRequest() ||
+                    reverseFriendshipDaoOptional.get().isPendingRequest();
+        }
+
+        boolean isFriends = doesFriendshipExist && !isFriendshipPending;
+
+        if (!isFriends) {
+            LOGGER.error(USER_NOT_FRIENDS_LOGGER_STRING, requesterId, receiverId);
             throw new UserManagementApiExampleException(USER_NOT_FRIENDS_ERROR, BAD_REQUEST);
         }
 
@@ -143,7 +158,8 @@ public class UserFriendsService {
         // Accept friendship and create reverse friendship record to ensure bidirectional relation
         friendshipDao.setAccepted(true);
 
-        FriendshipDao reverseFriendshipDao = new FriendshipDao(friendshipDao.getReceiver(), friendshipDao.getRequester());
+        FriendshipDao reverseFriendshipDao =
+                new FriendshipDao(friendshipDao.getReceiver(), friendshipDao.getRequester());
         reverseFriendshipDao.setAccepted(true);
 
         friendshipRepository.save(friendshipDao);
@@ -151,7 +167,8 @@ public class UserFriendsService {
     }
 
     public void declineFriendRequest(UUID receiverId, UUID requesterId) {
-        Optional<FriendshipDao> friendshipDaoOptional = friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
+        Optional<FriendshipDao> friendshipDaoOptional =
+                friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
 
         if (friendshipDaoOptional.isEmpty()) {
             LOGGER.error(FRIENDSHIP_NOT_FOUND_LOGGER_STRING, requesterId, receiverId);
