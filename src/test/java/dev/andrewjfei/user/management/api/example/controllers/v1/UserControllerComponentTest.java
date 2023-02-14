@@ -23,6 +23,7 @@ import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_NOT_FOUND_ERROR;
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_FRIEND_REQUEST_NOT_PENDING_ERROR;
 import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FOUND_ERROR;
+import static dev.andrewjfei.user.management.api.example.enums.Error.USER_NOT_FRIENDS_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -53,6 +54,9 @@ public class UserControllerComponentTest extends BaseComponentTest {
 
     private final String CASEY_WANG_USER_ID = "26770bad-887c-4ef7-a77c-f582d50e201c";
 
+    // Jax Jones
+    private final String JAX_JONES_USER_ID = "ee934861-9c00-4795-b78d-0bb760517dd4";
+
     // Alex Chen
 
     private final String ALEX_CHEN_USER_ID = "b0a73dff-25a8-4ea6-9a84-3a7338d04ba7";
@@ -78,8 +82,11 @@ public class UserControllerComponentTest extends BaseComponentTest {
     @Test
     public void testAddFriend_returnsCorrectResponse() {
         // Given
+        UUID requesterId = UUID.fromString(JOE_SMITH_USER_ID);
+        UUID receiverId = UUID.fromString(ALEX_CHEN_USER_ID);
         LocalDateTime now = LocalDateTime.now();
-        TargetUserIdRequest request = new TargetUserIdRequest(JOE_SMITH_USER_ID, ALEX_CHEN_USER_ID);
+
+        TargetUserIdRequest request = new TargetUserIdRequest(requesterId.toString(), receiverId.toString());
 
         // When
         ResponseEntity<BasicMessageResponse> response = userController.addFriend(request);
@@ -88,10 +95,7 @@ public class UserControllerComponentTest extends BaseComponentTest {
         assertEquals(OK, response.getStatusCode());
 
         Optional<FriendshipDao> friendshipDaoOptional =
-                friendshipRepository.findByRequesterIdAndReceiverId(
-                        UUID.fromString(JOE_SMITH_USER_ID),
-                        UUID.fromString(ALEX_CHEN_USER_ID)
-                );
+                friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
 
         if (friendshipDaoOptional.isEmpty()) {
             fail("Friendship record does not exist");
@@ -106,7 +110,9 @@ public class UserControllerComponentTest extends BaseComponentTest {
     @Test
     public void testAddFriend_pendingRequestOrAlreadyFriends_throwsException() {
         // Given
-        TargetUserIdRequest request = new TargetUserIdRequest(JOE_SMITH_USER_ID, CASEY_WANG_USER_ID);
+        UUID requesterId = UUID.fromString(JOE_SMITH_USER_ID);
+        UUID receiverId = UUID.fromString(CASEY_WANG_USER_ID);
+        TargetUserIdRequest request = new TargetUserIdRequest(requesterId.toString(), receiverId.toString());
 
         // When
         // Then
@@ -178,13 +184,61 @@ public class UserControllerComponentTest extends BaseComponentTest {
     }
 
     @Test
-    public void testRemoveFriend_returnsCorrectString() {
-        String expected = "Friend Removed.";
+    public void testRemoveFriend_returnsCorrectResponse() {
+        // Given
+        UUID requesterId = UUID.fromString(JOE_SMITH_USER_ID);
+        UUID receiverId = UUID.fromString(CASEY_WANG_USER_ID);
 
-        ResponseEntity<String> response = userController.removeFriend();
+        TargetUserIdRequest request = new TargetUserIdRequest(requesterId.toString(), receiverId.toString());
 
+        // When
+        ResponseEntity<BasicMessageResponse> response = userController.removeFriend(request);
+
+        // Then
         assertEquals(OK, response.getStatusCode());
-        assertEquals(expected, response.getBody());
+
+        Optional<FriendshipDao> friendshipDaoOptional =
+                friendshipRepository.findByRequesterIdAndReceiverId(requesterId, receiverId);
+
+        Optional<FriendshipDao> reverseFriendshipDaoOptional =
+                friendshipRepository.findByRequesterIdAndReceiverId(receiverId, requesterId);
+
+        assertTrue(friendshipDaoOptional.isEmpty());
+        assertTrue(reverseFriendshipDaoOptional.isEmpty());
+    }
+
+    @Test
+    public void testRemoveFriend_noFriendship_throwsException() {
+        // Given
+        UUID requesterId = UUID.fromString(JAX_JONES_USER_ID);
+        UUID receiverId = UUID.fromString(JOE_SMITH_USER_ID);
+
+        TargetUserIdRequest request = new TargetUserIdRequest(requesterId.toString(), receiverId.toString());
+
+        // When
+        // Then
+        UserManagementApiExampleException userManagementApiExampleException =
+                assertThrows(UserManagementApiExampleException.class, () ->  userController.removeFriend(request));
+
+        assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
+        assertEquals(USER_NOT_FRIENDS_ERROR, userManagementApiExampleException.getError());
+    }
+
+    @Test
+    public void testRemoveFriend_noReverseFriendship_throwsException() {
+        // Given
+        UUID requesterId = UUID.fromString(JOE_SMITH_USER_ID);
+        UUID receiverId = UUID.fromString(JAX_JONES_USER_ID);
+
+        TargetUserIdRequest request = new TargetUserIdRequest(requesterId.toString(), receiverId.toString());
+
+        // When
+        // Then
+        UserManagementApiExampleException userManagementApiExampleException =
+                assertThrows(UserManagementApiExampleException.class, () ->  userController.removeFriend(request));
+
+        assertEquals(BAD_REQUEST, userManagementApiExampleException.getHttpStatus());
+        assertEquals(USER_NOT_FRIENDS_ERROR, userManagementApiExampleException.getError());
     }
 
     /********************* User Friend Requests APIs *********************/
